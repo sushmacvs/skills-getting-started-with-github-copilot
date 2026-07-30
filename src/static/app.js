@@ -1,86 +1,63 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const activitiesList = document.getElementById("activities-list");
-  const activitySelect = document.getElementById("activity");
-  const signupForm = document.getElementById("signup-form");
-  const messageDiv = document.getElementById("message");
+  const todoForm = document.getElementById("todo-form");
+  const todoInput = document.getElementById("todo-input");
+  const todoList = document.getElementById("todo-list");
+  const emptyState = document.getElementById("empty-state");
 
-  // Function to fetch activities from API
-  async function fetchActivities() {
-    try {
-      const response = await fetch("/activities");
-      const activities = await response.json();
+  const tasks = [];
 
-      // Clear loading message
-      activitiesList.innerHTML = "";
+  function renderTasks() {
+    todoList.innerHTML = "";
 
-      // Populate activities list
-      Object.entries(activities).forEach(([name, details]) => {
-        const activityCard = document.createElement("div");
-        activityCard.className = "activity-card";
+    tasks.forEach((task) => {
+      const item = document.createElement("li");
+      item.className = `todo-item${task.completed ? " completed" : ""}`;
 
-        const spotsLeft = details.max_participants - details.participants.length;
+      const label = document.createElement("label");
 
-        activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-        `;
-
-        activitiesList.appendChild(activityCard);
-
-        // Add option to select dropdown
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        activitySelect.appendChild(option);
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = task.completed;
+      checkbox.addEventListener("change", () => {
+        task.completed = checkbox.checked;
+        item.classList.toggle("completed", task.completed);
       });
-    } catch (error) {
-      activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
-      console.error("Error fetching activities:", error);
-    }
+
+      const text = document.createElement("span");
+      text.textContent = task.text;
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.textContent = "Delete";
+      removeButton.addEventListener("click", () => {
+        const taskIndex = tasks.indexOf(task);
+        if (taskIndex !== -1) {
+          tasks.splice(taskIndex, 1);
+          renderTasks();
+        }
+      });
+
+      label.append(checkbox, text);
+      item.append(label, removeButton);
+      todoList.appendChild(item);
+    });
+
+    emptyState.classList.toggle("hidden", tasks.length > 0);
   }
 
-  // Handle form submission
-  signupForm.addEventListener("submit", async (event) => {
+  todoForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    const email = document.getElementById("email").value;
-    const activity = document.getElementById("activity").value;
-
-    try {
-      const response = await fetch(
-        `/activities/${encodeURIComponent(activity)}/signup?email=${encodeURIComponent(email)}`,
-        {
-          method: "POST",
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        messageDiv.textContent = result.message;
-        messageDiv.className = "success";
-        signupForm.reset();
-      } else {
-        messageDiv.textContent = result.detail || "An error occurred";
-        messageDiv.className = "error";
-      }
-
-      messageDiv.classList.remove("hidden");
-
-      // Hide message after 5 seconds
-      setTimeout(() => {
-        messageDiv.classList.add("hidden");
-      }, 5000);
-    } catch (error) {
-      messageDiv.textContent = "Failed to sign up. Please try again.";
-      messageDiv.className = "error";
-      messageDiv.classList.remove("hidden");
-      console.error("Error signing up:", error);
+    const text = todoInput.value.trim();
+    if (!text) {
+      return;
     }
+
+    tasks.push({ text, completed: false });
+    todoInput.value = "";
+    todoInput.focus();
+    renderTasks();
   });
 
-  // Initialize app
-  fetchActivities();
+  renderTasks();
 });

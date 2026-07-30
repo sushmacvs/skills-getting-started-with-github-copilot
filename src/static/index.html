@@ -3,47 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mergington High School Activities</title>
+    <title>Simple To-Do App</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Mergington High School</h1>
-      <h2>Extracurricular Activities</h2>
-    </header>
+    <main class="todo-app">
+      <h1>To-Do List</h1>
+      <form id="todo-form" class="todo-form">
+        <label for="todo-input" class="sr-only">New task</label>
+        <input id="todo-input" type="text" placeholder="Add a new task" required />
+        <button type="submit">Add</button>
+      </form>
 
-    <main>
-      <section id="activities-container">
-        <h3>Available Activities</h3>
-        <div id="activities-list">
-          <!-- Activities will be loaded here -->
-          <p>Loading activities...</p>
-        </div>
-      </section>
+      <ul id="todo-list" class="todo-list" aria-live="polite"></ul>
 
-      <section id="signup-container">
-        <h3>Sign Up for an Activity</h3>
-        <form id="signup-form">
-          <div class="form-group">
-            <label for="email">Student Email:</label>
-            <input type="email" id="email" required placeholder="your-email@mergington.edu" />
-          </div>
-          <div class="form-group">
-            <label for="activity">Select Activity:</label>
-            <select id="activity" required>
-              <option value="">-- Select an activity --</option>
-              <!-- Activity options will be loaded here -->
-            </select>
-          </div>
-          <button type="submit">Sign Up</button>
-        </form>
-        <div id="message" class="hidden"></div>
-      </section>
+      <p id="empty-state" class="empty-state">No tasks yet. Add one above.</p>
     </main>
-
-    <footer>
-      <p>&copy; 2023 Mergington High School</p>
-    </footer>
 
     <script src="app.js"></script>
   </body>
